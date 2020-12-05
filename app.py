@@ -1,22 +1,7 @@
 import streamlit as st
-import sys
-import numpy as np
-import pandas as pd
-from numpy import zeros
 import tensorflow as tf
-# helps in text preprocessing
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.preprocessing.text import Tokenizer
-
-# helps in model building
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.layers import Flatten
-from tensorflow.keras.layers import Dropout
-from tensorflow.keras.layers import Embedding
-from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.layers import LSTM
-from tensorflow.keras.optimizers import Adam
+import pickle
 
 
 st.title('Welcome to the Spam Detection Aplication')
@@ -25,11 +10,26 @@ st.header('Please provide your email body below')
 
 email = st.text_input('Email you will like to predict if it is spam or not')
 
-t = Tokenizer()
 
-encoded_test = t.texts_to_sequences(email)
+s_model = tf.keras.models.load_model("spam_detection")
 
-# pad documents to a max length of 6 words
-max_length = 6  
-padded_test = pad_sequences(encoded_test, maxlen=max_length, padding='post')
-print(padded_test)
+with open('spam_detection/tokenizer.pkl', 'rb') as input:
+    tokener = pickle.load(input)
+
+if email:
+
+    email = [email]
+    encoded_email = tokener.texts_to_sequences(email)
+
+    # pad documents to a max length of 6 words
+    max_length = 6  
+    padded_email = pad_sequences(encoded_email, maxlen=max_length, padding='post')
+
+    pred = s_model.predict(padded_email) 
+
+    if pred > 0.5:
+        st.info('This email is a spam! With a probability of: {}'.format(pred[0][0]) )
+    else:
+        st.info('This email is not a spam! With a probability of: {}'.format(pred[0][0]) )
+
+    st.write('End!')
