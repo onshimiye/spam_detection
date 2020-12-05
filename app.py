@@ -19,9 +19,11 @@ from tensorflow.keras.layers import LSTM
 from tensorflow.keras.optimizers import Adam
 
 
+st.title('Welcome to the Spam Detection Aplication')
 
+st.header('Please provide your email body below')
 
-email = st,input('Email you will like to predict if it is spam or not')
+email = st.text_input('Email you will like to predict if it is spam or not')
 
 t = Tokenizer()
 
